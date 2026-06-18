@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { endOfToday, startOfToday, formatShort, relativeDay } from "@/lib/dates";
 import { StatCards } from "@/components/StatCards";
 import { CompleteCallModal } from "@/components/CompleteCallModal";
+import { RepFilter } from "@/components/RepFilter";
 
 // Always render fresh — follow-up state is time-sensitive.
 export const dynamic = "force-dynamic";
@@ -53,36 +54,7 @@ export default async function HomePage({
         <h1 className="text-xl font-semibold text-slate-900">
           Today&apos;s Follow-ups ({dueList.length})
         </h1>
-        <form method="get" className="flex items-center gap-2">
-          <label className="text-sm text-slate-500">Rep</label>
-          <select
-            name="rep"
-            defaultValue={repFilter}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
-            // Submit immediately on change for a snappy filter.
-          >
-            <option value="">Everyone</option>
-            {reps.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Filter
-          </button>
-          {repFilter && (
-            <Link
-              href="/"
-              className="text-sm font-medium text-slate-500 hover:text-slate-800"
-            >
-              Clear
-            </Link>
-          )}
-        </form>
+        <RepFilter reps={reps} current={repFilter} />
       </div>
 
       <StatCards
