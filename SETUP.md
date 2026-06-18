@@ -74,15 +74,38 @@ cd ~/Documents/sales-followup-tracker
 npm run dev
 ```
 
-## To update to the latest version
+## Updating to the latest version
+When the admin says there's an update:
 ```bash
 cd ~/Documents/sales-followup-tracker
-git pull
-npm install
+git pull        # get the latest code
+npm install     # update dependencies + refresh the database client
 ```
+Then **restart the app**: in the terminal running it, press `Ctrl+C` to stop, then:
+```bash
+npm run dev
+```
+That's all you do — database changes are handled centrally by the admin, not on
+your machine.
 
 ## Something broke?
 - `command not found: brew` → re-run the two Apple-Silicon lines in Step 1.
 - `command not found: npm` → re-run Step 2.
 - Page won't load → make sure the `npm run dev` terminal is still open and shows
   "Ready". Keep that window open while using the app.
+
+---
+
+## For the admin: shipping an update
+1. Make your code changes and, if the database schema changed, create a migration:
+   ```bash
+   npx prisma migrate dev --name describe_change   # applies to the shared DB
+   ```
+2. Push to GitHub:
+   ```bash
+   git add -A && git commit -m "your change" && git push
+   ```
+3. Tell teammates to run the **Updating to the latest version** steps above.
+
+Because the database is shared (Neon), the migration only needs to run **once**
+(by you) — teammates just `git pull && npm install` to get matching code.
