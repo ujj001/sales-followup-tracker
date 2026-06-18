@@ -7,7 +7,8 @@ Everyone connects to the **same shared cloud database**, so all data and
 follow-ups are shared automatically.
 
 > ⚠️ **Two rules:**
-> 1. **Never run `npm run db:seed`** — it wipes the shared database.
+> 1. There is no seed/wipe command in the app. Do not add or run scripts that
+>    bulk-delete shared database rows.
 > 2. **Never share or commit your `.env` file** — it holds the team credentials.
 >    (The repo is public, so this matters: a leaked `.env` would be visible to everyone.)
 

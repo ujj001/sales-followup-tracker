@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { runPendingNotifications } from "@/lib/notify";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // Triggered by the client while the app is open (and callable manually / by cron).
 // Idempotent per rep per day, so it's safe to hit repeatedly from any machine.

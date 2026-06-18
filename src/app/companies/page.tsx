@@ -4,6 +4,7 @@ import { formatShort, relativeDay, startOfToday, endOfToday } from "@/lib/dates"
 import { DeleteButton } from "@/components/DeleteButton";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function CompaniesPage({
   searchParams,

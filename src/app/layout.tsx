@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { LiveDataRefresh } from "@/components/LiveDataRefresh";
 import { NotifyTrigger } from "@/components/NotifyTrigger";
 
 export const metadata: Metadata = {
@@ -14,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen antialiased" suppressHydrationWarning>
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
             <Link href="/" className="text-lg font-semibold text-slate-900">
@@ -44,6 +45,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+        <LiveDataRefresh />
         <NotifyTrigger />
       </body>
     </html>

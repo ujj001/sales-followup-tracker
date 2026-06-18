@@ -11,7 +11,9 @@ export function NotifyTrigger() {
 
   useEffect(() => {
     const ping = () => {
-      fetch("/api/notify", { method: "POST" }).catch(() => {});
+      fetch("/api/notify", { method: "POST", cache: "no-store" }).catch(
+        () => {},
+      );
     };
 
     if (!fired.current) {

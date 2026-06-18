@@ -8,12 +8,9 @@
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start -H 0.0.0.0 -p 3000",
     "lint": "next lint",
+    "db:check": "tsx scripts/db-check.ts",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

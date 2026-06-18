@@ -151,8 +151,13 @@ export async function runPendingNotifications(): Promise<NotifyResult[]> {
         status: "sent",
       });
     } catch (err) {
-      await prisma.notificationLog.deleteMany({
-        where: { repEmail: group.email, sentForDate: windowStart },
+      await prisma.notificationLog.delete({
+        where: {
+          repEmail_sentForDate: {
+            repEmail: group.email,
+            sentForDate: windowStart,
+          },
+        },
       });
       results.push({
         email: group.email,
