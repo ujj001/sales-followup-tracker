@@ -9,6 +9,7 @@ follow-ups are shared automatically.
 > ⚠️ **Two rules:**
 > 1. **Never run `npm run db:seed`** — it wipes the shared database.
 > 2. **Never share or commit your `.env` file** — it holds the team credentials.
+>    (The repo is public, so this matters: a leaked `.env` would be visible to everyone.)
 
 ---
 
@@ -27,9 +28,9 @@ Check it worked:
 brew --version
 ```
 
-## Step 2 — Install Node, Git, and GitHub CLI
+## Step 2 — Install Node and Git
 ```bash
-brew install node git gh
+brew install node git
 ```
 Check:
 ```bash
@@ -37,26 +38,19 @@ node --version    # v18 or higher
 git --version
 ```
 
-## Step 3 — Log in to GitHub
-```bash
-gh auth login
-```
-Answer the prompts: **GitHub.com** → **HTTPS** → **Yes** (authenticate Git) →
-**Login with a web browser** → copy the code, press Enter, authorize in browser.
-
-## Step 4 — Download the project
+## Step 3 — Download the project
 ```bash
 cd ~/Documents
-gh repo clone ujj001/sales-followup-tracker
+git clone https://github.com/ujj001/sales-followup-tracker.git
 cd sales-followup-tracker
 ```
 
-## Step 5 — Install the app's dependencies
+## Step 4 — Install the app's dependencies
 ```bash
 npm install
 ```
 
-## Step 6 — Add the team credentials
+## Step 5 — Add the team credentials
 Your admin will send you the secret values privately. Create the file and paste them:
 ```bash
 cp .env.example .env
@@ -66,7 +60,7 @@ In nano: delete the placeholder lines, paste the values the admin sent, then
 **Ctrl+O** → Enter (save), **Ctrl+X** (exit).
 *(Prefer a window? Use `open -e .env` to edit in TextEdit instead.)*
 
-## Step 7 — Run the app
+## Step 6 — Run the app
 ```bash
 npm run dev
 ```
