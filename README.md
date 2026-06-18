@@ -43,6 +43,7 @@ DIRECT_URL=     # Neon direct connection (no -pooler, used for migrations)
 npm run dev          # dev server
 npm run build        # prod build (runs prisma generate + migrate deploy)
 npm start            # prod server on 0.0.0.0:3000
+npm run typecheck    # TypeScript verification used by GitHub Actions CI
 npm run db:check     # verify which shared Neon DB this machine is using
 npm run db:studio    # browse the DB in Prisma Studio
 npm run notify:daily # send the daily rep email digest from Neon data
@@ -71,7 +72,8 @@ The workflow at `.github/workflows/daily-followup-emails.yml` runs on:
 ```
 
 GitHub Actions schedules are UTC, so this is 10:00 AM in Asia/Kolkata,
-Monday-Friday. The workflow can also be run manually from the GitHub Actions tab.
+Monday-Friday. The workflow can also be run manually from the GitHub Actions tab,
+with an optional dry run that previews recipients without sending.
 
 Required GitHub repository secrets:
 - `DATABASE_URL`
