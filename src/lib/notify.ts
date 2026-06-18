@@ -59,9 +59,12 @@ function buildHtml(group: RepGroup): string {
   </div>`;
 }
 
+// Notify each rep at most once per this many hours.
+const NOTIFY_INTERVAL_HOURS = 3;
+
 // Group pending follow-ups by rep email and send each rep their own digest.
-// Deduped to once per rep per day via NotificationLog (safe to call from many
-// machines — only the first call of the day actually sends for each rep).
+// Deduped to once per rep per NOTIFY_INTERVAL_HOURS window via NotificationLog
+// (safe to call from many machines — only the first call in each window sends).
 export async function runPendingNotifications(): Promise<NotifyResult[]> {
   if (!emailConfigured()) {
     return [
@@ -69,7 +72,9 @@ export async function runPendingNotifications(): Promise<NotifyResult[]> {
     ];
   }
 
-  const today = startOfToday();
+  // Start of the current N-hour window (e.g. 00:00, 03:00, 06:00 … for 3h).
+  const intervalMs = NOTIFY_INTERVAL_HOURS * 60 * 60 * 1000;
+  const windowStart = new Date(Math.floor(Date.now() / intervalMs) * intervalMs);
 
   const pending = await prisma.company.findMany({
     where: {
@@ -101,17 +106,17 @@ export async function runPendingNotifications(): Promise<NotifyResult[]> {
   const results: NotifyResult[] = [];
 
   for (const group of groups.values()) {
-    // Claim the day's slot first so concurrent machines can't double-send.
+    // Claim this window's slot first so concurrent machines can't double-send.
     try {
       await prisma.notificationLog.create({
         data: {
           repEmail: group.email,
-          sentForDate: today,
+          sentForDate: windowStart,
           companyCount: group.companies.length,
         },
       });
     } catch (e: unknown) {
-      // Unique violation → already sent today.
+      // Unique violation → already notified this window.
       if (
         typeof e === "object" &&
         e !== null &&
@@ -147,7 +152,7 @@ export async function runPendingNotifications(): Promise<NotifyResult[]> {
       });
     } catch (err) {
       await prisma.notificationLog.deleteMany({
-        where: { repEmail: group.email, sentForDate: today },
+        where: { repEmail: group.email, sentForDate: windowStart },
       });
       results.push({
         email: group.email,

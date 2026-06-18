@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
-// Pings the notify endpoint when the app is active, so reps get their daily
-// digest of pending follow-ups. The endpoint dedups to once per rep per day,
-// so triggering from every open tab / machine is harmless. Fires on load and
-// every 30 minutes while the app stays open.
+// Pings the notify endpoint while the app is active, so reps get reminded about
+// pending follow-ups. The endpoint dedups to once per rep per 3-hour window, so
+// triggering from every open tab / machine is harmless. Polls on load and every
+// 30 minutes — the backend ensures each rep is emailed at most once per 3 hours.
 export function NotifyTrigger() {
   const fired = useRef(false);
 
