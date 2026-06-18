@@ -4,6 +4,7 @@ import { endOfToday, startOfToday, formatShort, relativeDay } from "@/lib/dates"
 import { StatCards } from "@/components/StatCards";
 import { CompleteCallModal } from "@/components/CompleteCallModal";
 import { RepFilter } from "@/components/RepFilter";
+import { requireAllowedUser } from "@/lib/auth/guards";
 
 // Always render fresh — follow-up state is time-sensitive.
 export const dynamic = "force-dynamic";
@@ -14,6 +15,8 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ rep?: string }>;
 }) {
+  await requireAllowedUser();
+
   const { rep } = await searchParams;
   const repFilter = (rep ?? "").trim();
   const today = startOfToday();

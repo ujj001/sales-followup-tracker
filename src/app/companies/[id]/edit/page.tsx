@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { updateCompany } from "@/app/actions";
 import { CompanyForm } from "@/components/CompanyForm";
 import { formatShort } from "@/lib/dates";
+import { requireAllowedUser } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -12,6 +13,8 @@ export default async function EditCompanyPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAllowedUser();
+
   const { id } = await params;
   const company = await prisma.company.findUnique({
     where: { id },

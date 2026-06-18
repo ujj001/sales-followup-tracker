@@ -3,6 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatShort, relativeDay, startOfToday, endOfToday } from "@/lib/dates";
 import { DeleteButton } from "@/components/DeleteButton";
+import { requireAllowedUser } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -12,6 +13,8 @@ export default async function CompaniesPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  await requireAllowedUser();
+
   const { q } = await searchParams;
   const query = (q ?? "").trim();
   const today = startOfToday();

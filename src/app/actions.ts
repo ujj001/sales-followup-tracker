@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { addDays } from "@/lib/dates";
+import { requireAllowedUser } from "@/lib/auth/guards";
 
 function str(v: FormDataEntryValue | null): string {
   return (v ?? "").toString().trim();
@@ -18,6 +19,8 @@ function parseDate(v: FormDataEntryValue | null): Date | null {
 }
 
 export async function createCompany(formData: FormData) {
+  await requireAllowedUser();
+
   const name = str(formData.get("name"));
   const contactName = str(formData.get("contactName"));
   if (!name || !contactName) {
@@ -45,6 +48,8 @@ export async function createCompany(formData: FormData) {
 }
 
 export async function updateCompany(id: string, formData: FormData) {
+  await requireAllowedUser();
+
   const name = str(formData.get("name"));
   const contactName = str(formData.get("contactName"));
   if (!name || !contactName) {
@@ -73,6 +78,8 @@ export async function updateCompany(id: string, formData: FormData) {
 }
 
 export async function deleteCompany(id: string) {
+  await requireAllowedUser();
+
   await prisma.company.delete({ where: { id } });
   revalidatePath("/");
   revalidatePath("/companies");
@@ -80,6 +87,8 @@ export async function deleteCompany(id: string) {
 
 // Called from the "Complete Call" modal.
 export async function completeCall(formData: FormData) {
+  await requireAllowedUser();
+
   const id = str(formData.get("companyId"));
   const outcome = str(formData.get("outcome"));
   const note = str(formData.get("note"));

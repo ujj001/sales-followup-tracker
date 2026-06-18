@@ -1,7 +1,10 @@
 import { createCompany } from "@/app/actions";
 import { CompanyForm } from "@/components/CompanyForm";
+import { requireAllowedUser } from "@/lib/auth/guards";
 
-export default function NewCompanyPage() {
+export default async function NewCompanyPage() {
+  await requireAllowedUser();
+
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-4 text-xl font-semibold text-slate-900">

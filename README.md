@@ -36,6 +36,10 @@ npm run dev              # http://localhost:3000
 ```
 DATABASE_URL=   # Neon pooled connection (…-pooler… host, used at runtime)
 DIRECT_URL=     # Neon direct connection (no -pooler, used for migrations)
+VITE_NEON_AUTH_URL=       # Neon Auth URL from Project → Branch → Auth → Configuration
+NEON_AUTH_BASE_URL=       # optional alias for VITE_NEON_AUTH_URL
+NEON_AUTH_COOKIE_SECRET=  # generate with: openssl rand -base64 32
+ALLOWED_EMAIL_DOMAIN=equitylist.co
 ```
 
 ## Useful commands
@@ -64,6 +68,48 @@ npx prisma migrate dev --name <name>   # create a new migration after schema cha
   follow-ups receive a short "no follow-ups today" email.
 - To confirm every machine is on the same database, run `npm run db:check` and
   compare `database.host`, `database.database`, and the counts.
+
+## Authentication
+The app uses Neon Auth and only allows signed-in users whose email ends with
+`@equitylist.co`.
+
+To configure it:
+
+1. In Neon, open the project, then go to **Branch → Auth → Configuration**.
+2. Enable Neon Auth and copy the Auth URL into `NEON_AUTH_BASE_URL`.
+3. Generate a cookie secret:
+
+```bash
+openssl rand -base64 32
+```
+
+4. Add these variables locally and in Vercel:
+
+```txt
+VITE_NEON_AUTH_URL
+NEON_AUTH_COOKIE_SECRET
+ALLOWED_EMAIL_DOMAIN=equitylist.co
+```
+
+Until those variables are set, the app fails closed and shows a setup-required
+page instead of exposing CRM data.
+
+## Deploy on Vercel
+Use Vercel for the shared team URL so no teammate has to install Node or depend
+on one laptop staying awake.
+
+Required Vercel environment variables:
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `VITE_NEON_AUTH_URL`
+- `NEON_AUTH_COOKIE_SECRET`
+- `ALLOWED_EMAIL_DOMAIN`
+- `EMAIL_PROVIDER`
+- `AGENTMAIL_API_KEY` and `AGENTMAIL_INBOX_ID` for AgentMail, or
+  `RESEND_API_KEY` and `NOTIFY_FROM_EMAIL` for Resend
+
+The GitHub Actions daily email workflow remains separate from Vercel and will
+continue sending weekday emails from Neon data.
 
 ## Host on office Wi-Fi
 Use this when one laptop should run the app and everyone else should open it in
