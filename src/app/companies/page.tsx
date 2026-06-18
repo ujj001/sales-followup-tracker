@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatShort, relativeDay, startOfToday, endOfToday } from "@/lib/dates";
 import { DeleteButton } from "@/components/DeleteButton";
@@ -15,19 +16,10 @@ export default async function CompaniesPage({
   const query = (q ?? "").trim();
   const today = startOfToday();
   const todayEnd = endOfToday();
+  const where = query ? await buildCompanySearchWhere(query) : undefined;
 
   const companies = await prisma.company.findMany({
-    where: query
-      ? {
-          OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { contactName: { contains: query, mode: "insensitive" } },
-            { salesRep: { contains: query, mode: "insensitive" } },
-            { email: { contains: query, mode: "insensitive" } },
-            { phone: { contains: query, mode: "insensitive" } },
-          ],
-        }
-      : undefined,
+    where,
     orderBy: { nextFollowUp: "asc" },
   });
 
@@ -149,4 +141,40 @@ export default async function CompaniesPage({
       )}
     </div>
   );
+}
+
+async function buildCompanySearchWhere(
+  query: string,
+): Promise<Prisma.CompanyWhereInput> {
+  const normalizedQuery = query.toLowerCase();
+  const repRows = await prisma.company.findMany({
+    where: { salesRep: { not: null } },
+    distinct: ["salesRep"],
+    select: { salesRep: true },
+  });
+  const exactRepMatches = repRows
+    .map((row) => row.salesRep)
+    .filter(
+      (salesRep): salesRep is string =>
+        !!salesRep && salesRep.trim().toLowerCase() === normalizedQuery,
+    );
+
+  if (exactRepMatches.length > 0) {
+    return {
+      OR: exactRepMatches.map((salesRep) => ({
+        salesRep: { equals: salesRep, mode: "insensitive" },
+      })),
+    };
+  }
+
+  return {
+    OR: [
+      { name: { contains: query, mode: "insensitive" } },
+      { contactName: { contains: query, mode: "insensitive" } },
+      { salesRep: { contains: query, mode: "insensitive" } },
+      { salesRepEmail: { contains: query, mode: "insensitive" } },
+      { email: { contains: query, mode: "insensitive" } },
+      { phone: { contains: query, mode: "insensitive" } },
+    ],
+  };
 }
