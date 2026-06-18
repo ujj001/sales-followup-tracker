@@ -11,26 +11,47 @@ export const revalidate = 0;
 export default async function CompaniesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   await requireAllowedUser();
 
-  const { q } = await searchParams;
+  const { q, page } = await searchParams;
   const query = (q ?? "").trim();
   const today = startOfToday();
   const todayEnd = endOfToday();
   const where = query ? await buildCompanySearchWhere(query) : undefined;
 
+  const PAGE_SIZE = 20;
+  const totalCount = await prisma.company.count({ where });
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const currentPage = Math.min(
+    Math.max(1, Number.parseInt(page ?? "1", 10) || 1),
+    totalPages,
+  );
+
   const companies = await prisma.company.findMany({
     where,
     orderBy: { nextFollowUp: "asc" },
+    skip: (currentPage - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
+
+  const firstRow = totalCount === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const lastRow = (currentPage - 1) * PAGE_SIZE + companies.length;
+
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return qs ? `/companies?${qs}` : "/companies";
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-900">
-          All Companies ({companies.length})
+          All Companies ({totalCount})
         </h1>
         <Link
           href="/companies/new"
@@ -70,6 +91,7 @@ export default async function CompaniesPage({
             : "No companies yet — add your first one."}
         </div>
       ) : (
+        <>
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
@@ -141,6 +163,44 @@ export default async function CompaniesPage({
             </tbody>
           </table>
         </div>
+
+        <div className="flex items-center justify-between text-sm text-slate-600">
+          <span>
+            Showing {firstRow}–{lastRow} of {totalCount}
+          </span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-3">
+              {currentPage > 1 ? (
+                <Link
+                  href={pageHref(currentPage - 1)}
+                  className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  ← Previous
+                </Link>
+              ) : (
+                <span className="rounded-md border border-slate-200 px-3 py-1.5 font-medium text-slate-300">
+                  ← Previous
+                </span>
+              )}
+              <span className="font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              {currentPage < totalPages ? (
+                <Link
+                  href={pageHref(currentPage + 1)}
+                  className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Next →
+                </Link>
+              ) : (
+                <span className="rounded-md border border-slate-200 px-3 py-1.5 font-medium text-slate-300">
+                  Next →
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        </>
       )}
     </div>
   );
