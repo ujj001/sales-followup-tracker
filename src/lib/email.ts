@@ -9,7 +9,7 @@ export type SendArgs = {
 
 // Which provider to use. Defaults to AgentMail if its key is present, else Resend.
 export const emailProvider =
-  process.env.EMAIL_PROVIDER ??
+  process.env.EMAIL_PROVIDER?.trim() ||
   (process.env.AGENTMAIL_API_KEY ? "agentmail" : "resend");
 
 export function emailConfigured(): boolean {

@@ -45,6 +45,7 @@ npm run build        # prod build (runs prisma generate + migrate deploy)
 npm start            # prod server on 0.0.0.0:3000
 npm run db:check     # verify which shared Neon DB this machine is using
 npm run db:studio    # browse the DB in Prisma Studio
+npm run notify:daily # send the daily rep email digest from Neon data
 npx prisma migrate dev --name <name>   # create a new migration after schema changes
 ```
 
@@ -55,11 +56,29 @@ npx prisma migrate dev --name <name>   # create a new migration after schema cha
 - Open tabs refresh their server-rendered data every 15 seconds and whenever the
   tab becomes active, so changes from coworkers are pulled from Neon
   automatically.
-- The notification trigger only calls `/api/notify`; that API re-queries Neon for
-  due companies and writes `NotificationLog` rows in Neon to prevent duplicate
-  sends across machines.
+- GitHub Actions sends daily rep email digests at 10:00 AM Asia/Kolkata,
+  Monday-Friday. It reads sales rep emails and follow-up status directly from
+  Neon. Reps with due/overdue follow-ups receive the details; reps with no due
+  follow-ups receive a short "no follow-ups today" email.
 - To confirm every machine is on the same database, run `npm run db:check` and
   compare `database.host`, `database.database`, and the counts.
+
+## Scheduled emails
+The workflow at `.github/workflows/daily-followup-emails.yml` runs on:
+
+```txt
+30 4 * * 1-5
+```
+
+GitHub Actions schedules are UTC, so this is 10:00 AM in Asia/Kolkata,
+Monday-Friday. The workflow can also be run manually from the GitHub Actions tab.
+
+Required GitHub repository secrets:
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `EMAIL_PROVIDER`
+- `AGENTMAIL_API_KEY` and `AGENTMAIL_INBOX_ID` for AgentMail, or
+  `RESEND_API_KEY` and `NOTIFY_FROM_EMAIL` for Resend
 
 ## Notes
 - Changes from coworkers appear automatically while the app is open. Each tab

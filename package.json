@@ -10,7 +10,9 @@
     "lint": "next lint",
     "db:check": "tsx scripts/db-check.ts",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "notify:daily": "tsx scripts/send-daily-followups.ts",
+    "notify:daily:dry-run": "tsx scripts/send-daily-followups.ts --dry-run"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

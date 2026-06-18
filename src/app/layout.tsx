@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { LiveDataRefresh } from "@/components/LiveDataRefresh";
-import { NotifyTrigger } from "@/components/NotifyTrigger";
 
 export const metadata: Metadata = {
   title: "Sales Follow-up Manager",
@@ -46,7 +45,6 @@ export default function RootLayout({
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
         <LiveDataRefresh />
-        <NotifyTrigger />
       </body>
     </html>
   );
