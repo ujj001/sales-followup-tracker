@@ -41,6 +41,7 @@ DIRECT_URL=     # Neon direct connection (no -pooler, used for migrations)
 ## Useful commands
 ```bash
 npm run dev          # dev server
+npm run host:lan     # host on Wi-Fi so teammates can open http://YOUR-IP:3000
 npm run build        # prod build (runs prisma generate + migrate deploy)
 npm start            # prod server on 0.0.0.0:3000
 npm run typecheck    # TypeScript verification used by GitHub Actions CI
@@ -63,6 +64,41 @@ npx prisma migrate dev --name <name>   # create a new migration after schema cha
   follow-ups receive a short "no follow-ups today" email.
 - To confirm every machine is on the same database, run `npm run db:check` and
   compare `database.host`, `database.database`, and the counts.
+
+## Host on office Wi-Fi
+Use this when one laptop should run the app and everyone else should open it in
+their browser without installing Node or cloning the repo.
+
+On the host laptop:
+
+```bash
+cd "/Users/ujjwal/Documents/Porject/Deal Tracker/followup-manager"
+git pull
+npm install
+npm run host:lan
+```
+
+Find the host laptop's Wi-Fi IP:
+
+```bash
+ipconfig getifaddr en0
+```
+
+Then share this URL with teammates on the same Wi-Fi:
+
+```txt
+http://YOUR-IP:3000
+```
+
+Example for this laptop right now:
+
+```txt
+http://192.168.88.38:3000
+```
+
+Keep the Terminal window open while teammates use the app. If macOS asks whether
+Node can accept incoming network connections, allow it. If the laptop sleeps,
+disconnects from Wi-Fi, or closes the terminal, the shared link stops working.
 
 ## Scheduled emails
 The workflow at `.github/workflows/daily-followup-emails.yml` runs on:
