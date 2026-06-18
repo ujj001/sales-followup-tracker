@@ -1,61 +1,94 @@
-# Teammate Setup Guide
+# Teammate Setup Guide (Mac)
 
-Run the Sales Follow-up Manager on your laptop. Everyone connects to the **same
-shared cloud database**, so all data and follow-ups are shared automatically.
+From a brand-new Mac to the app running. Copy-paste each command into the
+**Terminal** app (find it: press `Cmd+Space`, type "Terminal", hit Enter).
 
-> ⚠️ **Do NOT run `npm run db:seed`** — it wipes the shared database and replaces
-> it with demo data. Only the admin should ever run that.
+Everyone connects to the **same shared cloud database**, so all data and
+follow-ups are shared automatically.
+
+> ⚠️ **Two rules:**
+> 1. **Never run `npm run db:seed`** — it wipes the shared database.
+> 2. **Never share or commit your `.env` file** — it holds the team credentials.
 
 ---
 
-## 1. Install Node.js (one-time)
-Download the **LTS** version from <https://nodejs.org> and install it.
-Verify in a terminal:
+## Step 1 — Install Homebrew (the installer for the tools below)
+Paste this and follow the prompts (it may ask for your Mac password):
 ```bash
-node --version    # should print v18 or higher
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+When it finishes, **Apple Silicon Macs (M1/M2/M3)** must run this so `brew` works:
+```bash
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+Check it worked:
+```bash
+brew --version
 ```
 
-## 2. Install Git (one-time)
-- **Mac:** run `git --version` — if missing, it will prompt to install (accept).
-- **Windows:** download from <https://git-scm.com/download/win> and install.
-
-## 3. Get access to the repo
-Ask the admin to add you as a collaborator on the GitHub repo, then accept the
-email invite.
-
-## 4. Clone the project
+## Step 2 — Install Node, Git, and GitHub CLI
 ```bash
-git clone https://github.com/ujj001/sales-followup-tracker.git
+brew install node git gh
+```
+Check:
+```bash
+node --version    # v18 or higher
+git --version
+```
+
+## Step 3 — Log in to GitHub
+```bash
+gh auth login
+```
+Answer the prompts: **GitHub.com** → **HTTPS** → **Yes** (authenticate Git) →
+**Login with a web browser** → copy the code, press Enter, authorize in browser.
+
+## Step 4 — Download the project
+```bash
+cd ~/Documents
+gh repo clone ujj001/sales-followup-tracker
 cd sales-followup-tracker
 ```
 
-## 5. Install dependencies
+## Step 5 — Install the app's dependencies
 ```bash
 npm install
 ```
 
-## 6. Add the shared credentials
-Create your `.env` file from the template and paste the values the admin sends
-you (privately — never commit them):
+## Step 6 — Add the team credentials
+Your admin will send you the secret values privately. Create the file and paste them:
 ```bash
 cp .env.example .env
-nano .env        # paste values, then Ctrl+O Enter to save, Ctrl+X to exit
+nano .env
 ```
-(Or `open -e .env` to edit in TextEdit on Mac.)
+In nano: delete the placeholder lines, paste the values the admin sent, then
+**Ctrl+O** → Enter (save), **Ctrl+X** (exit).
+*(Prefer a window? Use `open -e .env` to edit in TextEdit instead.)*
 
-## 7. Run it
+## Step 7 — Run the app
 ```bash
 npm run dev
 ```
-Open <http://localhost:3000> in your browser. You're in.
+Open **http://localhost:3000** in your browser. Done! 🎉
 
 ---
 
-## Daily use
-Just `cd sales-followup-tracker && npm run dev` whenever you want to use it.
-
-## To get the latest version later
+## Every day after this
 ```bash
+cd ~/Documents/sales-followup-tracker
+npm run dev
+```
+
+## To update to the latest version
+```bash
+cd ~/Documents/sales-followup-tracker
 git pull
 npm install
 ```
+
+## Something broke?
+- `command not found: brew` → re-run the two Apple-Silicon lines in Step 1.
+- `command not found: npm` → re-run Step 2.
+- Page won't load → make sure the `npm run dev` terminal is still open and shows
+  "Ready". Keep that window open while using the app.
