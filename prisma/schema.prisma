@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection (Supabase pgBouncer, port 6543) — used at runtime.
+  url       = env("DATABASE_URL")
+  // Direct connection (port 5432) — used for migrations.
+  directUrl = env("DIRECT_URL")
+}
+
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  contactName   String
+  salesRep      String?
+  salesRepEmail String?
+  phone         String?
+  email         String?
+  notes         String?
+  lastContacted DateTime?
+  nextFollowUp  DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  calls         CallLog[]
+
+  @@index([nextFollowUp])
+  @@index([salesRep])
+}
+
+// History of every completed call / interaction.
+model CallLog {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  outcome      String
+  note         String?
+  nextFollowUp DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([companyId])
+}
+
+// Dedup record so a rep's daily digest sends only once, no matter how many
+// machines trigger it. One row per (rep email, day).
+model NotificationLog {
+  id           String   @id @default(cuid())
+  repEmail     String
+  sentForDate  DateTime
+  companyCount Int
+  createdAt    DateTime @default(now())
+
+  @@unique([repEmail, sentForDate])
+}
