@@ -176,7 +176,44 @@ async function main() {
       : `Hi ${rep.name}, no follow-ups are due today (${today}).`;
 
     if (!dryRun) {
-      await sendEmail({ to: rep.email, subject, html, text });
+      try {
+        await prisma.notificationLog.create({
+          data: {
+            repEmail: rep.email,
+            sentForDate: start,
+            companyCount: dueCompanies.length,
+          },
+        });
+      } catch (error: unknown) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "code" in error &&
+          (error as { code?: string }).code === "P2002"
+        ) {
+          console.log(
+            `Skipped daily email to ${rep.email}: already sent for ${today}`,
+          );
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    if (!dryRun) {
+      try {
+        await sendEmail({ to: rep.email, subject, html, text });
+      } catch (error) {
+        await prisma.notificationLog.delete({
+          where: {
+            repEmail_sentForDate: {
+              repEmail: rep.email,
+              sentForDate: start,
+            },
+          },
+        });
+        throw error;
+      }
     }
     console.log(
       `${dryRun ? "Would send" : "Sent"} daily email to ${rep.email}: ${dueCompanies.length} due, ${rep.companies.length} assigned`,

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { toDateInput } from "@/lib/dates";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type CompanyData = {
   id: string;
@@ -112,12 +113,7 @@ export function CompanyForm({
         >
           Cancel
         </Link>
-        <button
-          type="submit"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-        >
-          {submitLabel}
-        </button>
+        <SubmitButton>{submitLabel}</SubmitButton>
       </div>
     </form>
   );
