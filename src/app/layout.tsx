@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1";
 
 export default async function RootLayout({
   children,

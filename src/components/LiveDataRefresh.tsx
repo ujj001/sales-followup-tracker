@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const REFRESH_INTERVAL_MS = 15 * 1000;
+const REFRESH_INTERVAL_MS = 45 * 1000;
 
 // Keeps open local builds synced with the shared Neon-backed server state.
 export function LiveDataRefresh() {
