@@ -14,6 +14,15 @@ export async function GET(request: NextRequest) {
 
   try {
     const results = await runDailyFollowupEmails();
+    console.log(
+      "daily-followups cron",
+      JSON.stringify({
+        sent: results.filter((result) => result.status === "sent").length,
+        skipped: results.filter((result) => result.status === "already-sent")
+          .length,
+        total: results.length,
+      }),
+    );
     return NextResponse.json({
       ok: true,
       sent: results.filter((result) => result.status === "sent").length,
