@@ -188,31 +188,26 @@ export async function runDailyFollowupEmails({
       continue;
     }
 
-    try {
-      await prisma.notificationLog.create({
-        data: {
+    const claimed = await prisma.notificationLog.createMany({
+      data: [
+        {
           repEmail: rep.email,
           sentForDate: start,
           companyCount: dueCompanies.length,
         },
+      ],
+      skipDuplicates: true,
+    });
+
+    if (claimed.count === 0) {
+      results.push({
+        email: rep.email,
+        rep: rep.name,
+        due: dueCompanies.length,
+        assigned: rep.companies.length,
+        status: "already-sent",
       });
-    } catch (error: unknown) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        (error as { code?: string }).code === "P2002"
-      ) {
-        results.push({
-          email: rep.email,
-          rep: rep.name,
-          due: dueCompanies.length,
-          assigned: rep.companies.length,
-          status: "already-sent",
-        });
-        continue;
-      }
-      throw error;
+      continue;
     }
 
     try {
